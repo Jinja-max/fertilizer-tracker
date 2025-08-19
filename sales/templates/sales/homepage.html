@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load custom_filters %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fertilizer Sales Tracker - PACS DHARMASAGAR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .shop-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .officials {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .official-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+        .official-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .official-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .history-table {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .fertilizer-badge {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .alert-custom {
+            border-left: 4px solid #28a745;
+        }
+        .no-history {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .clear-btn {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <div class="container">
+            <div class="shop-name">🌾 PACS DHARMASAGAR</div>
+            <div class="officials">
+                <div class="official-badge">
+                    <div class="official-title">Chairman</div>
+                    <div class="official-name">Rajeshwar Reddy</div>
+                </div>
+                <div class="official-badge">
+                    <div class="official-title">CEO</div>
+                    <div class="official-name">Raji Reddy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="flex-grow-1 text-center">Fertilizer Sales Management System</h1>
+            <a href="{% url 'sales:all_details' %}" class="btn btn-info">View All Details</a>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <!-- Customer History Search Section -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">📋 Check Customer History</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ search_form.aadhar_number.id_for_label }}" class="form-label">
+                                    Aadhar Number
+                                </label>
+                                {{ search_form.aadhar_number }}
+                                {% if search_form.aadhar_number.errors %}
+                                    <div class="text-danger small">
+                                        {{ search_form.aadhar_number.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" name="search" class="btn btn-primary w-100">
+                                Search History
+                            </button>
+                            <button type="button" onclick="clearAllFields()" class="btn btn-warning w-100 clear-btn">
+                                Clear All
+                            </button>
+                        </form>
+
+                        {% if customer_history %}
+                            <div class="mt-4">
+                                <h5>History for Aadhar: {{ customer_history.aadhar }}</h5>
+                                {% if customer_history.sales %}
+                                    <div class="history-table">
+                                        <table class="table table-striped table-sm">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>Fertilizers Purchased</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for datetime, items in customer_history.sales.items %}
+                                                    {% with datetime_parts=datetime|split:"|" %}
+                                                    <tr>
+                                                        <td>{{ datetime_parts.0 }}</td>
+                                                        <td>{{ datetime_parts.1 }}</td>
+                                                        <td>
+                                                            {% for item in items %}
+                                                                <span class="badge bg-success fertilizer-badge">
+                                                                    {{ item.fertilizer }}: {{ item.quantity }} bags
+                                                                </span>
+                                                            {% endfor %}
+                                                        </td>
+                                                    </tr>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert no-history" role="alert">
+                                        <strong>No History</strong> - This customer has not purchased any fertilizers yet.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Record New Sale Section -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">💰 Record New Sale</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ sale_form.aadhar_number.id_for_label }}" class="form-label">
+                                    Customer Aadhar Number
+                                </label>
+                                {{ sale_form.aadhar_number }}
+                                {% if sale_form.aadhar_number.errors %}
+                                    <div class="text-danger small">
+                                        {{ sale_form.aadhar_number.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="mb-3">Select Fertilizers and Quantities (in bags):</h6>
+                            
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <label class="form-label">UREA (bags)</label>
+                                    {{ sale_form.urea_quantity }}
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">DAP (bags)</label>
+                                    {{ sale_form.dap_quantity }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label">POTASH (bags)</label>
+                                    {{ sale_form.potash_quantity }}
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">20-20 (bags)</label>
+                                    {{ sale_form.twenty_twenty_quantity }}
+                                </div>
+                            </div>
+
+                            {% if sale_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ sale_form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <button type="submit" name="record_sale" class="btn btn-success w-100">
+                                Record Sale
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fertilizer Stock Warning -->
+        <div class="card mt-3">
+            <div class="card-body bg-warning bg-opacity-10">
+                <h5 class="card-title">⚠️ Important Notice</h5>
+                <p class="card-text mb-0">
+                    There is currently a shortage of the following fertilizers:
+                    <strong>UREA, DAP, POTASH, 20-20</strong>. 
+                    Please check customer history before making sales to ensure fair distribution.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-format Aadhar input as user types
+        function formatAadhar(input) {
+            let value = input.value.replace(/\s/g, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length && i < 12; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            input.value = formattedValue;
+        }
+
+        // Add event listeners for Aadhar formatting
+        document.getElementById('search_aadhar').addEventListener('input', function(e) {
+            formatAadhar(this);
+            // Auto-populate the sale form aadhar field
+            document.getElementById('sale_aadhar').value = this.value;
+        });
+
+        document.getElementById('sale_aadhar').addEventListener('input', function(e) {
+            formatAadhar(this);
+        });
+
+        // Clear all fields function
+        function clearAllFields() {
+            document.getElementById('search_aadhar').value = '';
+            document.getElementById('sale_aadhar').value = '';
+            // Clear quantity fields
+            document.querySelectorAll('input[type="number"]').forEach(function(input) {
+                input.value = '';
+            });
+        }
+
+        // Prevent non-numeric input in Aadhar fields (except spaces)
+        document.getElementById('search_aadhar').addEventListener('keypress', function(e) {
+            const char = String.fromCharCode(e.which);
+            if (!/[0-9]/.test(char) && e.which !== 32 && e.which !== 8) {
+                e.preventDefault();
+            }
+        });
+
+        document.getElementById('sale_aadhar').addEventListener('keypress', function(e) {
+            const char = String.fromCharCode(e.which);
+            if (!/[0-9]/.test(char) && e.which !== 32 && e.which !== 8) {
+                e.preventDefault();
+            }
+        });
+
+        // Preserve the sale_aadhar value after form submission
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check if search_aadhar has value and copy to sale_aadhar
+            var searchAadhar = document.getElementById('search_aadhar').value;
+            if (searchAadhar) {
+                document.getElementById('sale_aadhar').value = searchAadhar;
+            }
+        });
+    </script>
+</body>
+</html>
