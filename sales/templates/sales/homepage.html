@@ -90,11 +90,14 @@
     </div>
 
     <div class="container">
+<!-- Update the section with View All Details button in homepage.html -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="flex-grow-1 text-center">Fertilizer Sales Management System</h1>
-            <a href="{% url 'sales:all_details' %}" class="btn btn-info">View All Details</a>
+            <div>
+                <a href="{% url 'sales:enter_old_data' %}" class="btn btn-warning me-2">Enter Old Data</a>
+                <a href="{% url 'sales:all_details' %}" class="btn btn-info">View All Details</a>
+            </div>
         </div>
-        
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
@@ -135,7 +138,10 @@
 
                         {% if customer_history %}
                             <div class="mt-4">
-                                <h5>History for Aadhar: {{ customer_history.aadhar }}</h5>
+                                <h5>Customer Details:</h5>
+                                <p><strong>Aadhar:</strong> {{ customer_history.aadhar }}</p>
+                                <p><strong>Name:</strong> {{ customer_history.name }}</p>
+                                <p><strong>Village:</strong> {{ customer_history.village }}</p>
                                 {% if customer_history.sales %}
                                     <div class="history-table">
                                         <table class="table table-striped table-sm">
@@ -193,6 +199,31 @@
                                 {% if sale_form.aadhar_number.errors %}
                                     <div class="text-danger small">
                                         {{ sale_form.aadhar_number.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- In the Record New Sale Section, after the aadhar_number field, add: -->
+                            <div class="mb-3">
+                                <label for="customer_name" class="form-label">
+                                    Customer Name
+                                </label>
+                                {{ sale_form.customer_name }}
+                                {% if sale_form.customer_name.errors %}
+                                    <div class="text-danger small">
+                                        {{ sale_form.customer_name.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="village" class="form-label">
+                                    Village
+                                </label>
+                                {{ sale_form.village }}
+                                {% if sale_form.village.errors %}
+                                    <div class="text-danger small">
+                                        {{ sale_form.village.errors }}
                                     </div>
                                 {% endif %}
                             </div>
@@ -277,10 +308,12 @@
             formatAadhar(this);
         });
 
-        // Clear all fields function
+        // In the clearAllFields function, add:
         function clearAllFields() {
             document.getElementById('search_aadhar').value = '';
             document.getElementById('sale_aadhar').value = '';
+            document.getElementById('customer_name').value = '';
+            document.getElementById('village').selectedIndex = 0;
             // Clear quantity fields
             document.querySelectorAll('input[type="number"]').forEach(function(input) {
                 input.value = '';

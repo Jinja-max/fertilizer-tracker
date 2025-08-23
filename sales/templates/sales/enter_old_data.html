@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Old Data - PACS DHARMASAGAR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .shop-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .officials {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .official-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+        .official-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .official-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .card {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .date-time-group {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <div class="container">
+            <div class="shop-name">🌾 PACS DHARMASAGAR</div>
+            <div class="officials">
+                <div class="official-badge">
+                    <div class="official-title">Chairman</div>
+                    <div class="official-name">Rajeshwar Reddy</div>
+                </div>
+                <div class="official-badge">
+                    <div class="official-title">CEO</div>
+                    <div class="official-name">Raji Reddy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📝 Enter Old Data from Records</h2>
+            <div>
+                <a href="{% url 'sales:homepage' %}" class="btn btn-primary">Back to Home</a>
+                <a href="{% url 'sales:all_details' %}" class="btn btn-info">View All Details</a>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">Enter Historical Sale Data</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="date-time-group">
+                        <h6 class="mb-3">📅 Date and Time (Optional - Leave blank to use current time)</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.sale_date.id_for_label }}" class="form-label">
+                                    Sale Date (DD-MM-YYYY)
+                                </label>
+                                <input type="text" 
+                                    name="sale_date" 
+                                    class="form-control" 
+                                    id="sale_date" 
+                                    placeholder="DD-MM-YYYY"
+                                    value="{{ form.sale_date.value|default:'' }}"
+                                    maxlength="10">
+                                <small class="text-muted">Date will be preserved for next entry</small>
+                                {% if form.sale_date.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.sale_date.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.sale_time.id_for_label }}" class="form-label">
+                                    Sale Time (Optional)
+                                </label>
+                                {{ form.sale_time }}
+                                <small class="text-muted">Leave blank to use 12:00 PM</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3">👤 Customer Information</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.aadhar_number.id_for_label }}" class="form-label">
+                                Aadhar Number
+                            </label>
+                            {{ form.aadhar_number }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.customer_name.id_for_label }}" class="form-label">
+                                Customer Name
+                            </label>
+                            {{ form.customer_name }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.village.id_for_label }}" class="form-label">
+                                Village
+                            </label>
+                            {{ form.village }}
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3">🌾 Fertilizer Quantities (in bags)</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">UREA</label>
+                            {{ form.urea_quantity }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">DAP</label>
+                            {{ form.dap_quantity }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">POTASH</label>
+                            {{ form.potash_quantity }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">20-20</label>
+                            {{ form.twenty_twenty_quantity }}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            Save Old Record
+                        </button>
+                        <button type="button" onclick="clearForm()" class="btn btn-secondary">
+                            Clear Form (Except Date)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-format Aadhar input
+        function formatAadhar(input) {
+            let value = input.value.replace(/\s/g, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length && i < 12; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            input.value = formattedValue;
+        }
+
+        document.getElementById('old_aadhar').addEventListener('input', function(e) {
+            formatAadhar(this);
+        });
+
+        // Clear form except date
+        function clearForm() {
+            // Save the date value
+            var dateValue = document.getElementById('sale_date').value;
+            
+            // Clear all inputs
+            document.getElementById('old_aadhar').value = '';
+            document.getElementById('id_customer_name').value = '';
+            document.getElementById('id_village').selectedIndex = 0;
+            document.getElementById('sale_time').value = '';
+            
+            // Clear quantity fields
+            document.querySelectorAll('input[type="number"]').forEach(function(input) {
+                input.value = '';
+            });
+            
+            // Restore the date value
+            document.getElementById('sale_date').value = dateValue;
+        }
+
+        // Add this function in the <script> section of enter_old_data.html
+
+        // Auto-format date input as DD-MM-YYYY
+        function formatDate(input) {
+            let value = input.value.replace(/\D/g, ''); // Remove non-digits
+            let formattedValue = '';
+            
+            if (value.length >= 1) {
+                formattedValue = value.substring(0, 2);
+            }
+            if (value.length >= 3) {
+                formattedValue += '-' + value.substring(2, 4);
+            }
+            if (value.length >= 5) {
+                formattedValue += '-' + value.substring(4, 8);
+            }
+            
+            input.value = formattedValue;
+        }
+
+        // Add event listener for date formatting
+        document.getElementById('sale_date').addEventListener('input', function(e) {
+            formatDate(this);
+        });
+
+        // Prevent non-numeric input in date field
+        document.getElementById('sale_date').addEventListener('keypress', function(e) {
+            const char = String.fromCharCode(e.which);
+            if (!/[0-9]/.test(char) && e.which !== 8 && e.which !== 45) {
+                e.preventDefault();
+            }
+        });
+
+    </script>
+</body>
+</html>

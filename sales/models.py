@@ -13,10 +13,52 @@ class Customer(models.Model):
         validators=[aadhar_validator],
         unique=True
     )
+    
+    # In models.py, add these fields to the Customer class after aadhar_number:
+
+    VILLAGE_CHOICES = [
+        ('Dharmasagar', 'Dharmasagar'),
+        ('Somadevarapalli', 'Somadevarapalli'),
+        ('Devnoor', 'Devnoor'),
+        ('Unikicherla', 'Unikicherla'),
+        ('Elukurthy', 'Elukurthy'),
+        ('Saipet', 'Saipet'),
+        ('Kyathamapelli', 'Kyathamapelli'),
+        ('Janakipuram', 'Janakipuram'),
+        ('Velair', 'Velair'),
+        ('Narayanagiri', 'Narayanagiri'),
+        ('Peesara', 'Peesara'),
+        ('Mallikudrla', 'Mallikudrla'),
+        ('Shapalli', 'Shapalli'),
+        ('Gundlasagaram', 'Gundlasagaram'),
+        ('Peddapendyala', 'Peddapendyala'),
+        ('Rampur', 'Rampur'),
+        ('Dharmapur', 'Dharmapur'),
+        ('Mallakapelli', 'Mallakapelli'),
+        ('Ravigudem', 'Ravigudem'),
+        ('Thatikayala', 'Thatikayala'),
+    ]
+
+    customer_name = models.CharField(
+        max_length=100,
+        default='Not Available',
+        blank=True
+    )
+    village = models.CharField(
+        max_length=50,
+        choices=VILLAGE_CHOICES,
+        default='Not Available',
+        blank=True
+    )
+
+    # Update the _str_ method:
+    def _str_(self):
+        return f"{self.customer_name} - {self.aadhar_number} - {self.village}"
+    
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def __str__(self):
-        return f"Customer: {self.aadhar_number}"
+    # def __str__(self):
+    #     return f"Customer: {self.aadhar_number}"
 
 class FertilizerSale(models.Model):
     FERTILIZER_CHOICES = [
