@@ -89,17 +89,24 @@
 
         <!-- Analytics Section -->
         <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="analytics-card">
-                    <h5>🏆 Top Customer</h5>
-                    {% if top_customer %}
-                        <div class="stat-value">{{ top_customer.total_bags }} bags</div>
-                        <div>Aadhar: {{ top_customer.aadhar }}</div>
-                    {% else %}
-                        <div>No sales yet</div>
-                    {% endif %}
+            <!-- Update the Top Customer(s) card in all_details.html: -->
+                <div class="col-md-4">
+                    <div class="analytics-card">
+                        <h5>🏆 Top Customer(s)</h5>
+                        {% if top_customers %}
+                            <div class="stat-value">{{ top_customers.0.total_bags }} bags</div>
+                            {% for customer in top_customers %}
+                                <div class="mb-2">
+                                    <strong>{{ customer.name }}</strong><br>
+                                    <small>Aadhar: {{ customer.aadhar }}</small><br>
+                                    <small>Village: {{ customer.village }}</small>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div>No sales yet</div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
             <div class="col-md-4">
                 <div class="analytics-card">
                     <h5>📦 Total Sales by Type</h5>
@@ -134,6 +141,7 @@
                 </div>
             </form>
 
+                        <!-- Replace the table section in all_details.html with this: -->
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead class="table-dark">
@@ -141,8 +149,9 @@
                             <th>Date</th>
                             <th>Time</th>
                             <th>Aadhar Number</th>
-                            <th>Fertilizer Type</th>
-                            <th>Quantity (bags)</th>
+                            <th>Customer Name</th>
+                            <th>Village</th>
+                            <th>Fertilizers Purchased</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,14 +160,19 @@
                                 <td>{{ sale.date }}</td>
                                 <td>{{ sale.time }}</td>
                                 <td>{{ sale.aadhar }}</td>
+                                <td>{{ sale.name }}</td>
+                                <td>{{ sale.village }}</td>
                                 <td>
-                                    <span class="badge bg-success">{{ sale.fertilizer }}</span>
+                                    {% for fertilizer in sale.fertilizers %}
+                                        <span class="badge bg-success me-1">
+                                            {{ fertilizer.type }}: {{ fertilizer.quantity }} bags
+                                        </span>
+                                    {% endfor %}
                                 </td>
-                                <td>{{ sale.quantity }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center">No sales records found</td>
+                                <td colspan="6" class="text-center">No sales records found</td>
                             </tr>
                         {% endfor %}
                     </tbody>
